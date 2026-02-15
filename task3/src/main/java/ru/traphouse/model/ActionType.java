@@ -1,4 +1,7 @@
 package ru.traphouse.model;
 
-public class ActionType {
+public enum ActionType {
+    ERUPT,   // выскакивание
+    DIVE,    // спикирование
+    ESCAPE   // бегство
 }
