@@ -9,7 +9,6 @@ class ActionTest {
     @Test
     void storesAllFields() {
         Place pavement = new Place("Мостовая");
-        Place sky = new Place("Небо");
         Person ford = new Person("Форд");
 
         Action a = new Action(ActionType.ESCAPE, ford, null, pavement, null);

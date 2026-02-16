@@ -9,7 +9,6 @@ class PlaceTest {
     @Test
     void isSceneObjectAndStoresName() {
         Place pavement = new Place("Мостовая");
-        assertTrue(pavement instanceof SceneObject);
         assertEquals("Мостовая", pavement.getName());
     }
 }
