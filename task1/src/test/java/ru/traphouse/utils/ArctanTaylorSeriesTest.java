@@ -2,7 +2,8 @@ package ru.traphouse.utils;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ArctanTaylorSeriesTest {
 
@@ -90,4 +91,78 @@ class ArctanTaylorSeriesTest {
         assertThrows(IllegalArgumentException.class,
                 () -> ArctanTaylorSeries.arctan(Double.POSITIVE_INFINITY));
     }
+
+    /**
+     * Проверка выброса исключения для отрицательной бесконечности.
+     */
+    @Test
+    void testNegativeInfinity() {
+        assertThrows(IllegalArgumentException.class,
+                () -> ArctanTaylorSeries.arctan(Double.NEGATIVE_INFINITY));
+    }
+
+    /**
+     * Проверка значения очень близкого к верхней границе диапазона сходимости.
+     */
+    @Test
+    void testVeryNearUpperBoundary() {
+        assertEquals(Math.atan(0.9999999999), ArctanTaylorSeries.arctan(0.9999999999), DELTA);
+    }
+
+    /**
+     * Проверка значения очень близкого к нижней границе диапазона сходимости.
+     */
+    @Test
+    void testVeryNearLowerBoundary() {
+        assertEquals(Math.atan(-0.9999999999), ArctanTaylorSeries.arctan(-0.9999999999), DELTA);
+    }
+
+    /**
+     * Проверка значения сразу за верхней границей диапазона сходимости.
+     */
+    @Test
+    void testJustAboveOne() {
+        assertEquals(Math.atan(1.0000000001), ArctanTaylorSeries.arctan(1.0000000001), DELTA);
+    }
+
+    /**
+     * Проверка значения сразу за нижней границей диапазона сходимости.
+     */
+    @Test
+    void testJustBelowMinusOne() {
+        assertEquals(Math.atan(-1.0000000001), ArctanTaylorSeries.arctan(-1.0000000001), DELTA);
+    }
+
+    /**
+     * Проверка очень малого положительного значения.
+     */
+    @Test
+    void testVerySmallPositive() {
+        assertEquals(Math.atan(0.0000000001), ArctanTaylorSeries.arctan(0.0000000001), DELTA);
+    }
+
+    /**
+     * Проверка очень малого отрицательного значения.
+     */
+    @Test
+    void testVerySmallNegative() {
+        assertEquals(Math.atan(-0.0000000001), ArctanTaylorSeries.arctan(-0.0000000001), DELTA);
+    }
+
+    /**
+     * Проверка среднего положительного значения в диапазоне сходимости.
+     */
+    @Test
+    void testMiddlePositive() {
+        assertEquals(Math.atan(0.5), ArctanTaylorSeries.arctan(0.5), DELTA);
+    }
+
+    /**
+     * Проверка среднего отрицательного значения в диапазоне сходимости.
+     */
+    @Test
+    void testMiddleNegative() {
+        assertEquals(Math.atan(-0.5), ArctanTaylorSeries.arctan(-0.5), DELTA);
+    }
+
 }
