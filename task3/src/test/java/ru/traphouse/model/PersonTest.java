@@ -11,4 +11,14 @@ class PersonTest {
         Person arthur = new Person("Артур");
         assertEquals("Артур", arthur.getName());
     }
+
+    @Test
+    void escapingStateChangesCorrectly() {
+        Person arthur = new Person("Артур");
+
+        assertFalse(arthur.isEscaping());
+
+        arthur.startEscape();
+        assertTrue(arthur.isEscaping());
+    }
 }
