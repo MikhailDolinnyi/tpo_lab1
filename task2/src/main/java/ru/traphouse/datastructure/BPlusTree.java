@@ -15,14 +15,6 @@ public class BPlusTree<K extends Comparable<K>, V> {
 
     private Node root;
 
-    // Для тестов собираем все операции, которые происходят при вставке
-    private final List<String> trace = new ArrayList<>();
-
-    public List<String> getTrace() {
-        return trace;
-    }
-
-
     public BPlusTree() {
         root = new LeafNode();
     }
@@ -33,8 +25,6 @@ public class BPlusTree<K extends Comparable<K>, V> {
 
         // Если корень переполнился и разделился - создаем новый корень выше
         if (result != null) {
-            trace.add("T5");
-
             InternalNode newRoot = new InternalNode();
             newRoot.keys.add(result.key);
             newRoot.children.add(root);
@@ -45,6 +35,21 @@ public class BPlusTree<K extends Comparable<K>, V> {
 
     public V search(K key) {
         return root.search(key);
+    }
+
+    // Возвращает все ключи в отсортированном порядке, обходя листья по цепочке
+    public List<K> getKeysInOrder() {
+        List<K> result = new ArrayList<>();
+        Node current = root;
+        while (!current.isLeaf()) {
+            current = ((InternalNode) current).children.getFirst();
+        }
+        LeafNode leaf = (LeafNode) current;
+        while (leaf != null) {
+            result.addAll(leaf.keys);
+            leaf = leaf.next;
+        }
+        return result;
     }
 
     /**
@@ -68,18 +73,16 @@ public class BPlusTree<K extends Comparable<K>, V> {
 
         @Override
         Split insert(K key, V value) {
-            trace.add("T3"); // проход через внутренний узел
-
             // binarySearch возвращает индекс, если нашел или -(insertion point) - 1, если не нашел
             int index = Collections.binarySearch(keys, key);
-            // Определяем, в какого ребенка идти (эпштейн??). Если ключ >= keys[i], идем в child[i+1]
+            // Если ключ >= keys[i], идем в child[i+1]
             int childIndex = index >= 0 ? index + 1 : -index - 1;
 
-            // Рекурсивно вставляем в нужного ребенка (пэдэдэ?)
+            // Рекурсивно вставляем в нужного ребенка
             Split split = children.get(childIndex).insert(key, value);
 
             if (split == null) {
-                return null; // Ребенок не разделился - все ок (ватафа шнеле)
+                return null; // Ребенок не разделился - все ок
             }
 
             // Ребенок разделился, теперь нужно добавить новый ключ и новую ссылку
@@ -95,8 +98,6 @@ public class BPlusTree<K extends Comparable<K>, V> {
         }
 
         private Split splitInternal() {
-            trace.add("T4"); // split внутреннего узла
-
             // Делим узел пополам
             int mid = keys.size() / 2;
             // Средний ключ поднимается. Он не остается ни в левом, ни в правом узле
@@ -140,8 +141,6 @@ public class BPlusTree<K extends Comparable<K>, V> {
 
         @Override
         Split insert(K key, V value) {
-            trace.add("T1"); // вставка в лист
-
             int index = Collections.binarySearch(keys, key);
 
             // Если ключ уже есть, то просто обновляем значение
@@ -165,8 +164,6 @@ public class BPlusTree<K extends Comparable<K>, V> {
         }
 
         private Split splitLeaf() {
-            trace.add("T2"); // split листа
-
             // Делим данные пополам
             int mid = keys.size() / 2;
 
@@ -180,7 +177,7 @@ public class BPlusTree<K extends Comparable<K>, V> {
             keys.subList(mid, keys.size()).clear();
             values.subList(mid, values.size()).clear();
 
-            // Тряска! Вставляем новый лист в цепочку: this -> right -> old_next
+            // Вставляем новый лист в цепочку: this -> right -> old_next
             right.next = this.next;
             this.next = right;
 
@@ -233,7 +230,6 @@ public class BPlusTree<K extends Comparable<K>, V> {
 
     // Выводит все листья в порядке слева направо, используя связный список
     public void printLeaves() {
-        // Спускаемся до самого левого листа
         Node current = root;
         while (!current.isLeaf()) {
             current = ((InternalNode) current).children.getFirst();
@@ -241,7 +237,6 @@ public class BPlusTree<K extends Comparable<K>, V> {
 
         LeafNode leaf = (LeafNode) current;
 
-        // Проходим по цепочке листьев
         System.out.print("Leaves: ");
         while (leaf != null) {
             System.out.print(leaf.keys + " ");
